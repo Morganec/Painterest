@@ -7,7 +7,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.graphics.Palette;
@@ -25,7 +27,9 @@ import java.io.InputStream;
 
 public class MainActivity extends AppCompatActivity implements ColorPickerDialog.OnColorChangedListener {
     private static final int RESULT_LOAD_IMG = 0;
+    static final int REQUEST_IMAGE_CAPTURE = 1;
     DrawingView dv ;
+    LinearLayout linearLayout;
     int size;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,8 +37,7 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
         setContentView(R.layout.activity_main);
         final SeekBar sk=(SeekBar) findViewById(R.id.seekBar);
         size= sk.getProgress();
-
-        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.line1);
+         linearLayout = (LinearLayout) findViewById(R.id.line1);
         dv = new DrawingView(this);
 
         linearLayout.addView(dv);
@@ -120,7 +123,47 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
             }
         });
 
+        final Button btnTakePict = (Button) findViewById(R.id.btnTakePict);
+        btnTakePict.setOnClickListener(new View.OnClickListener() {
+
+
+            @Override
+            public void onClick(View v) {
+
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+
+                    startActivityForResult(takePictureIntent,REQUEST_IMAGE_CAPTURE);
+                    takePictureIntent.getExtras();
+
+
+                }
+
+            }
+        });
+
+
+
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        ImageView imageView = ( ImageView) findViewById(R.id.image);
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            BitmapDrawable imageDraw = new BitmapDrawable(imageBitmap);
+           //imageView.setImageBitmap(imageBitmap);
+            dv.setBackground(imageDraw);
+
+        }
+
+
+
+    }
+
     @Override
     public void colorChanged(String key, int color) {
         // TODO Auto-generated method stub
