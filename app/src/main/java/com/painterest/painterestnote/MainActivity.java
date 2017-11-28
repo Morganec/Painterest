@@ -155,7 +155,18 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             BitmapDrawable imageDraw = new BitmapDrawable(imageBitmap);
-           //imageView.setImageBitmap(imageBitmap);
+            dv.setBackground(imageDraw);
+
+        }else if(requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK){
+            Bitmap bm=null;
+            if (data != null) {
+                try {
+                    bm = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), data.getData());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            BitmapDrawable imageDraw = new BitmapDrawable(bm);
             dv.setBackground(imageDraw);
 
         }
@@ -163,6 +174,8 @@ public class MainActivity extends AppCompatActivity implements ColorPickerDialog
 
 
     }
+
+
 
     @Override
     public void colorChanged(String key, int color) {
